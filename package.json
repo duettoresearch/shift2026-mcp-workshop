@@ -1,0 +1,34 @@
+{
+  "name": "duetto-mcp",
+  "version": "1.0.0",
+  "description": "Agentic hotel pricing MCP server + Claude Agent SDK workshop",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "tsx src/mcp/stdio.ts",
+    "mcp": "tsx src/mcp/stdio.ts",
+    "mcp:http": "tsx src/mcp/http.ts",
+    "api": "tsx src/api/server.ts",
+    "agent": "tsx src/agent/run.ts",
+    "eval": "vitest run",
+    "eval:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.263",
+    "@modelcontextprotocol/node": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "express": "^5.2.1",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.5.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}

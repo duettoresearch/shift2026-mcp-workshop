@@ -60,6 +60,66 @@ export function createHotelPricingServer(
     }
   );
 
+  server.registerTool(
+    "list_signals",
+    {
+      inputSchema: z.object({
+        hotelId: z.string().optional(),
+      }),
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async ({ hotelId }) =>
+      jsonResult({
+        now: engine.getNowIso(),
+        data: engine.listSignals(hotelId),
+      }),
+  );
+
+  server.registerTool(
+    "list_alerts",
+    {
+      inputSchema: z.object({
+        hotelId: z.string()
+      }),
+      annotations: { readOnlyHint: true}
+    },
+    async ({hotelId}) => {
+      try {
+        return jsonResult({alerts: engine.listAlerts(hotelId)})
+      } catch (err) {
+        return errorResult(`Having problems! ${err}!`);
+      }
+    }
+  );
+
+  server.registerTool("send_alert",
+    {
+      inputSchema: z.object({
+        hotelId: z.string(),
+        signalId: z.string(),
+        stayDates: z.array(date_api_schema).describe("List of dates we need to set an alert for"),
+        severity: z.enum(["info", "warning", "critical"]),
+        recommendation: z.string().describe("What is the recommendation to proceed with after getting the signal"),
+        rationale: z.string().describe("why this severity was picked and under what conditions")
+      }),
+      annotations: { readOnlyHint: false}
+    },
+    async ({signalId, hotelId, stayDates, severity, recommendation, rationale}) => {
+      try {
+        const alert = engine.sendAlert({
+            signalId, hotelId,
+            stayDates: stayDates as string[],
+            severity,
+            recommendation, rationale
+        });
+
+        return jsonResult({alert: alert});
+      } catch (error) {
+        return errorResult(`Having problems! ${error}!`);
+      }
+    }
+  );
+
   return server;
 }
 
@@ -70,6 +130,7 @@ export const READ_TOOL_NAMES = [
   "get_demand",
   "get_rates",
   "list_group_blocks",
+  "send_alert",
   "list_signals",
   "list_alerts",
 ] as const;

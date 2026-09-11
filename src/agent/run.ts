@@ -27,7 +27,11 @@ When you alert via ${WRITE_TOOL_NAME}:
 Hotel for this workshop: HARBOR-01 unless told otherwise.`;
 
 function parseArgs(argv: string[]) {
-  const args = { resume: undefined as string | undefined, prompt: undefined as string | undefined };
+  const args = {
+    resume: undefined as string | undefined,
+    prompt: undefined as string | undefined
+  };
+
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--resume" && argv[i + 1]) {
@@ -83,6 +87,8 @@ export async function runAgent(options: {
   let sessionId: string | undefined = options.resume;
   const toolCalls: Array<{ name: string; input: Record<string, unknown> }> = [];
 
+  const mcpHttpPort = options.mcpEnv?.MCP_HTTP_PORT ?? process.env.MCP_HTTP_PORT ?? "3848";
+
   for await (const message of query({
     prompt,
     options: {
@@ -93,14 +99,12 @@ export async function runAgent(options: {
       permissionMode: "default",
       allowedTools,
       mcpServers: {
+        // Connect to the already-running MCP HTTP server so the agent shares
+        // the same in-process engine as any other client watching it live
+        // (e.g. a demo audience polling list_signals/list_alerts).
         [MCP_SERVER_NAME]: {
-          command: "npm",
-          args: ["--prefix", options.cwd ?? ROOT, "start"],
-          env: Object.fromEntries(
-            Object.entries({ ...process.env, ...options.mcpEnv }).filter(
-              (e): e is [string, string] => typeof e[1] === "string",
-            ),
-          ),
+          type: "http",
+          url: `http://localhost:${mcpHttpPort}/mcp`,
         },
       },
       canUseTool: async (toolName, toolInput) => {
@@ -174,10 +178,10 @@ const isMain =
   process.argv[1]?.endsWith("agent/run.js");
 
 if (isMain) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error("Set ANTHROPIC_API_KEY (see .env.example)");
-    process.exit(1);
-  }
+  // if (!process.env.ANTHROPIC_API_KEY) {
+  //   console.error("Set ANTHROPIC_API_KEY (see .env.example)");
+  //   process.exit(1);
+  // }
   const args = parseArgs(process.argv.slice(2));
   runAgent(args).catch((err) => {
     console.error(err);

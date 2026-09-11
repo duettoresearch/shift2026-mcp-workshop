@@ -1,6 +1,17 @@
 # Agentic Hotel Pricing through MCP + Claude Agent SDK
 
+## Intro
+
 Workshop stack: a **Duetto-shaped mock RMS**, an **MCP server** that exposes live pricing/demand tools, and a **stateful Claude Agent SDK** agent that decides whether to alert a revenue manager — with human approval on `send_alert`, session resume so the agent does not re-alert, and evals that prove alerts are actionable.
+
+## Actual workshop pitch
+
+Agentic Hotel Pricing through MCP and Claude Agent SDK: 
+
+Hotel demand shifts by the hour but pricing decisions still wait for someone to notice and act. In this workshop, build an MCP server that exposes a live pricing/demand engine as tools, then wire it into a stateful Claude agent, built with Anthropic's Agent SDK, that decides whether, when, and how to alert a revenue manager when a real pricing opportunity or risk fires (e.g. a demand spike or an unfilled block).
+Using the Agent SDK's built-in permissions, you'll gate the "send alert" action behind human approval, and use sessions so the agent never re-alerts on the same signal twice. Add an evals step to prove alerts are actually actionable, not just noisy.
+
+Leave with a working signal-to-recommendation Claude agent pattern you can adapt to your own systems.
 
 ## Quick start
 
@@ -75,16 +86,21 @@ Also: resource `hotel://{hotelId}/snapshot` and prompt `review_pricing_signals`.
 
 ## Agent loop (workshop path)
 
+The agent connects to the MCP server over HTTP rather than spawning its own copy, so it shares the same live engine as anything else watching (Cursor, an MCP inspector, the audience). Start the HTTP server once and leave it running for the whole demo — every read/write below lands in that one process.
+
 ```bash
-# Terminal A optional — inspect mock API while agent runs
-SCENARIO=demand-spike npm run api
+# Terminal A — start once, leave running for the whole demo
+SCENARIO=demand-spike npm run mcp:http
 
 # Terminal B — first pass: agent should propose send_alert
-SCENARIO=demand-spike npm run agent
+npm run agent
 # Approve with y when prompted. Note the printed session_id.
 
+# Terminal C (or your MCP client / Cursor) — query list_alerts / list_signals
+# against the same server right after approving: the alert is visible immediately.
+
 # Second pass — same session: should NOT re-alert
-SCENARIO=demand-spike npm run agent -- --resume <session_id>
+npm run agent -- --resume <session_id>
 ```
 
 De-dupe is two-layer:

@@ -8,11 +8,11 @@
     "node": ">=20"
   },
   "scripts": {
-    "start": "tsx src/mcp/stdio.ts",
-    "mcp": "tsx src/mcp/stdio.ts",
-    "mcp:http": "tsx src/mcp/http.ts",
-    "api": "tsx src/api/server.ts",
-    "agent": "tsx src/agent/run.ts",
+    "start": "tsx --env-file=.env src/mcp/stdio.ts",
+    "mcp": "tsx --env-file=.env src/mcp/stdio.ts",
+    "mcp:http": "tsx --env-file=.env src/mcp/http.ts",
+    "api": "tsx --env-file=.env src/api/server.ts",
+    "agent": "tsx --env-file=.env src/agent/run.ts",
     "eval": "vitest run",
     "eval:watch": "vitest",
     "typecheck": "tsc --noEmit"

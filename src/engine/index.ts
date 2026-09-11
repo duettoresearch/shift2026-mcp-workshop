@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type {
   AlertRecord,
+  ApiSnapshotDbg,
   DailyDemand,
   DailyOccupancy,
   DailyRates,
@@ -57,7 +58,7 @@ export interface EngineOptions {
  * In-process Duetto-shaped pricing/demand engine.
  * Sim clock ticks hours; scenarios inject spikes, wash risk, or noise.
  */
-export class PricingEngine {
+export class PricingEngine implements PricingEngine {
   readonly hotel: Hotel = { ...HOTEL };
   private hour: number;
   private readonly baseDate: StayDate;
@@ -210,7 +211,7 @@ export class PricingEngine {
     return record;
   }
 
-  snapshot() {
+  snapshot(): ApiSnapshotDbg {
     return {
       now: this.getNowIso(),
       hour: this.hour,

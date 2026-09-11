@@ -8,7 +8,7 @@ import {
   READ_TOOL_NAMES,
   WRITE_TOOL_NAME,
   mcpToolName,
-} from "../mcp/server.js";
+} from "../mcp/mcp.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 

@@ -92,6 +92,58 @@ export interface AlertRecord {
   status: "sent" | "duplicate_blocked";
 }
 
+export interface ApiSnapshotDbg {
+  now: string;
+  hour: number;
+  scenario: ScenarioName;
+  hotels: Hotel[];
+  occupancy: DailyOccupancy[];
+  demand: DailyDemand[];
+  rates: DailyRates[];
+  blocks: GroupBlock[];
+  signals: PricingSignal[];
+  alerts: AlertRecord[];
+}
+
+export interface PricingEngine {
+  getNowIso(): string;
+  getHour(): number;
+  getScenario(): ScenarioName;
+  listHotels(): Hotel[];
+  tick(hours: number): void;
+
+  setScenario(scenario: ScenarioName): void;
+
+  reset(scenario?: ScenarioName): void;
+
+  stayDates(days: number): StayDate[] ;
+
+  getOccupancy(hotelId: HotelId, from?: StayDate, to?: StayDate): DailyOccupancy[];
+
+  getDemand(hotelId: HotelId, from?: StayDate, to?: StayDate): DailyDemand[];
+
+  getRates(hotelId: HotelId, from?: StayDate, to?: StayDate): DailyRates[] ;
+
+  listGroupBlocks(hotelId: HotelId): GroupBlock[];
+
+  listSignals(hotelId?: HotelId): PricingSignal[];
+
+  listAlerts(hotelId?: HotelId): AlertRecord[];
+
+  hasAlertForSignal(signalId: string): boolean ;
+
+  sendAlert(input: {
+    signalId: string;
+    hotelId: HotelId;
+    stayDates: StayDate[];
+    severity: SignalSeverity;
+    recommendation: string;
+    rationale: string;
+  }): AlertRecord;
+
+  snapshot(): ApiSnapshotDbg;
+}
+
 export const SCENARIO_NAMES = ["baseline", "demand-spike", "unfilled-block", "noise"];
 export type ScenarioName = (typeof SCENARIO_NAMES)[number];
 

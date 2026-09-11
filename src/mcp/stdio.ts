@@ -1,5 +1,5 @@
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
-import { createHotelPricingServer } from "./server.js";
+import { createHotelPricingServer } from "./mcp.js";
 import { getSharedEngine } from "../engine/index.js";
 
 async function main() {

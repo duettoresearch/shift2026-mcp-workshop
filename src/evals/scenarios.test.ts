@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { PricingEngine } from "../engine/index.js";
-import { createHotelPricingServer } from "../mcp/server.js";
+import { createHotelPricingServer } from "../mcp/mcp.js";
 import { ACTIONABLE_RECOMMENDATION } from "./graders.js";
 
 describe("PricingEngine scenarios", () => {

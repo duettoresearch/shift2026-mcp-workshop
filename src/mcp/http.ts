@@ -2,7 +2,7 @@ import express from "express";
 import { randomUUID } from "node:crypto";
 import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
 import { isInitializeRequest } from "@modelcontextprotocol/server";
-import { createHotelPricingServer } from "./server.js";
+import { createHotelPricingServer } from "./mcp.js";
 import { getSharedEngine } from "../engine/index.js";
 
 async function main() {

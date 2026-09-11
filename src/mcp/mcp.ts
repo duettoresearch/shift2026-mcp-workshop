@@ -19,6 +19,10 @@ function errorResult(message: string) {
   };
 }
 
+const date_api_schema = z.string()
+.optional()
+.describe("This is the stay date in the format YYYY-MM-DD");
+
 /**
  * Build an MCP server bound to a pricing engine.
  */
@@ -30,19 +34,31 @@ export function createHotelPricingServer(
     version: "1.0.0",
   });
 
-  server.registerTool("echo", 
-    {
-      title: "Echo",
-      description: "Just a simple echo method",
-      inputSchema: z.object({
-        text: z.string()
-      })
-  }, async ({text}) => {
-    return {
-      content: [{type: "text", text: "Hello " + text}],
-      isError: false
+  server.registerTool("list_hotels", {},
+    async () => {
+    try {
+      return jsonResult({hotels: engine.listHotels()});
+    } catch (error) {
+      return errorResult(`Something went wrong! Error: ${error}`);
     }
   });
+
+  server.registerTool("list_hotel_rates", {
+    inputSchema: z.object({
+      hotelId: z.string(),
+      from: date_api_schema,
+      to: date_api_schema
+    }),
+    annotations: {readOnlyHint: true}
+  },
+    async ({hotelId, from, to}) => {
+      try {
+        return jsonResult({rates: engine.getRates(hotelId, from, to)});
+      } catch (error) {
+        return errorResult(`Meh! ${error}!`);
+      }
+    }
+  );
 
   return server;
 }

@@ -30,6 +30,20 @@ export function createHotelPricingServer(
     version: "1.0.0",
   });
 
+  server.registerTool("echo", 
+    {
+      title: "Echo",
+      description: "Just a simple echo method",
+      inputSchema: z.object({
+        text: z.string()
+      })
+  }, async ({text}) => {
+    return {
+      content: [{type: "text", text: "Hello " + text}],
+      isError: false
+    }
+  });
+
   return server;
 }
 

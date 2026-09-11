@@ -4,7 +4,7 @@ import {
   getSharedEngine,
   type PricingEngine,
 } from "../engine/index.js";
-import type { SignalSeverity } from "../engine/types.js";
+import { SCENARIO_NAMES, type ScenarioName, type SignalSeverity } from "../engine/types.js";
 
 function jsonResult<T extends Record<string, unknown>>(data: T) {
   return {
@@ -176,6 +176,26 @@ export function createHotelPricingServer(
     },
     async ({ hotelId }) =>
       jsonResult({ data: engine.listAlerts(hotelId) }),
+  );
+
+  server.registerTool(
+    "reset_state",
+    {
+      title: "Reset the mocked API state",
+      description:
+        "Resetting the mocked API state in order to test the prompt again.",
+      inputSchema: z.object({
+        scenario: z.string()
+      .refine(
+        (val): val is ScenarioName => SCENARIO_NAMES.includes(val as ScenarioName),
+        { message: `Must be one of: ${SCENARIO_NAMES.join(", ")}` }
+      )
+      .describe(`The scenario name to execute. Must be one of: ${SCENARIO_NAMES.join(", ")}`)
+      }),
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async ({ scenario }) =>
+      jsonResult({ data: engine.reset(scenario) }),
   );
 
   server.registerTool(

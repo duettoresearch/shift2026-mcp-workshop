@@ -92,11 +92,8 @@ export interface AlertRecord {
   status: "sent" | "duplicate_blocked";
 }
 
-export type ScenarioName =
-  | "baseline"
-  | "demand-spike"
-  | "unfilled-block"
-  | "noise";
+export const SCENARIO_NAMES = ["baseline", "demand-spike", "unfilled-block", "noise"];
+export type ScenarioName = (typeof SCENARIO_NAMES)[number];
 
 export interface EngineSnapshot {
   now: string;

@@ -35,40 +35,40 @@ async function main() {
       // ── PHASE 1: give the agent an MCP server + tools to call ──────────
       // Points at the HTTP MCP server (`npm run mcp`), not a spawned stdio
       // child — start that process first, this just connects to it.
-      // mcpServers: {
-      //   [MCP_SERVER_NAME]: {
-      //     type: "http",
-      //     url: `http://localhost:${process.env.MCP_HTTP_PORT ?? 3848}/mcp`,
-      //   },
-      // },
+      mcpServers: {
+        [MCP_SERVER_NAME]: {
+          type: "http",
+          url: `http://localhost:${process.env.MCP_HTTP_PORT ?? 3848}/mcp`,
+        },
+      },
 
       // ── PHASE 2: restrict which tools it's permitted to execute ────────
-      // allowedTools: READ_TOOL_NAMES.map(mcpToolName),
-      // permissionMode: "default", // required for canUseTool (PHASE 4) to fire
+      allowedTools: READ_TOOL_NAMES.map(mcpToolName),
+      permissionMode: "default", // required for canUseTool (PHASE 4) to fire
 
       // ── PHASE 3: give it state — resume the prior session from disk ────
-      // resume: existsSync(SESSION_FILE)
-      //   ? readFileSync(SESSION_FILE, "utf-8").trim()
-      //   : undefined,
+      resume: existsSync(SESSION_FILE)
+        ? readFileSync(SESSION_FILE, "utf-8").trim()
+        : undefined,
 
       // ── PHASE 4: human-in-the-loop gate before the write tool fires ────
       // This is the ONLY gate for send_alert: it isn't in allowedTools, so
       // every call reaches canUseTool and gets this explicit confirm —
       // independent of whatever generic MCP tool-permission prompt fired
       // for the read tools above.
-      // canUseTool: async (toolName, input) => {
-      //   if (toolName !== mcpToolName(WRITE_TOOL_NAME)) {
-      //     return { behavior: "allow", updatedInput: input };
-      //   }
-      //   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-      //   const answer = await rl.question(
-      //     `\nAgent wants to ${WRITE_TOOL_NAME}: ${JSON.stringify(input, null, 2)}\nApprove? (y/n) `,
-      //   );
-      //   rl.close();
-      //   return answer.trim().toLowerCase() === "y"
-      //     ? { behavior: "allow", updatedInput: input }
-      //     : { behavior: "deny", message: "Rejected by human reviewer" };
-      // },
+      canUseTool: async (toolName, input) => {
+        if (toolName !== mcpToolName(WRITE_TOOL_NAME)) {
+          return { behavior: "allow", updatedInput: input };
+        }
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const answer = await rl.question(
+          `\nAgent wants to ${WRITE_TOOL_NAME}: ${JSON.stringify(input, null, 2)}\nApprove? (y/n) `,
+        );
+        rl.close();
+        return answer.trim().toLowerCase() === "y"
+          ? { behavior: "allow", updatedInput: input }
+          : { behavior: "deny", message: "Rejected by human reviewer" };
+      },
     },
   });
 
@@ -76,7 +76,7 @@ async function main() {
   for await (const message of stream) {
     if (message.type === "system" && message.subtype === "init") {
       // PHASE 3: stash the session id so the next run can resume it
-      // writeFileSync(SESSION_FILE, message.session_id);
+      writeFileSync(SESSION_FILE, message.session_id);
     }
 
     if (message.type === "assistant") {
@@ -96,9 +96,9 @@ async function main() {
 }
 
 // ── PHASE 4 (loop): run the check on an interval instead of once ─────────
-// while (true) {
-//   await main();
-//   await new Promise((resolve) => setTimeout(resolve, 10_000));
-// }
+while (true) {
+  await main();
+  await new Promise((resolve) => setTimeout(resolve, 10_000));
+}
 
 main().catch(console.error);

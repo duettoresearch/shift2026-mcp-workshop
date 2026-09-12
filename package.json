@@ -8,7 +8,6 @@
     "node": ">=20"
   },
   "scripts": {
-    "start": "tsx --env-file=.env src/mcp/stdio.ts",
     "mcp": "tsx --env-file=.env src/mcp/http.ts",
     "api": "tsx --env-file=.env src/api/server.ts",
     "agent": "tsx --env-file=.env src/agent/run.ts",

@@ -126,11 +126,7 @@ export function createHotelPricingServer(
 /** MCP tool names used by the agent allow-list. */
 export const READ_TOOL_NAMES = [
   "list_hotels",
-  "get_occupancy",
-  "get_demand",
-  "get_rates",
-  "list_group_blocks",
-  "send_alert",
+  "list_hotel_rates",
   "list_signals",
   "list_alerts",
 ] as const;

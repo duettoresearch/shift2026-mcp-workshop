@@ -60,6 +60,9 @@ export function createHotelPricingServer(
     }
   );
 
+
+  // STEP 1 - let's register a tool to fetch signals
+  // ==============================================
   server.registerTool(
     "list_signals",
     {
@@ -75,6 +78,9 @@ export function createHotelPricingServer(
       }),
   );
 
+
+  // STEP 2 - let's register a tools to fetch and send alerts
+  // ==============================================
   server.registerTool(
     "list_alerts",
     {
